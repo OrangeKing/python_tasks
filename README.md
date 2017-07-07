@@ -6,9 +6,9 @@ Simple python tutorial app example with usage of lists and other basic types/str
 
 1. Clone/fetch project
 2. Run:
- ~~~~ {.sourceCode .bash}
+```bash
  $ ./tasks.py
- ~~~~
+```
 3. Follow onscreen instructions.
 
 ## Excercise
