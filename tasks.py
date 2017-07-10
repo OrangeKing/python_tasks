@@ -8,8 +8,10 @@ import colorama
 #coloring support (for priorities & errors)
 colorama.init()
 
-#global task 'vector'
-#tasks = []
+class Task(object):
+    def __init__(self, name,priority):
+        self.name = name
+        self.priority = priority
 
 #primitive ui
 def printMenu():
@@ -18,36 +20,27 @@ def printMenu():
     print("Select an action to perform:\n ")
     for item in menu_items:
         print(item)
-
     print("q - quit program\n ")
 
-
 def createTask(task_list):
-    current_task = []
-
     name = (raw_input("Task name: ")).lower()
-    current_task.append(name)
-
     try:
         priority = int(raw_input("Select priority (1-low 2-medium 3-high): "))
     except ValueError:
         print("Setting default priority as 0")
         priority = 0
 
-    current_task.append(priority)
+    current_task = Task(name,priority)
     task_list.append(current_task)
 
 def removeTask(task_list):
     try:
         task_done = raw_input("Select a task to be completed/removed: ")
-        for i,tsk in enumerate(task_list):
-            for j,name in enumerate(tsk):
-                if name == task_done:
-                    print(colored("NAME: " + tsk[0] + " PRIORITY: "\
-                     + str(tsk[1]),"blue") + " has been deleted\n")
-
-                    task_list.remove(tsk)
-
+        for tsk in task_list:
+            if tsk.name == task_done:
+                print(colored("NAME: " + tsk.name + " PRIORITY: "\
+                 + str(tsk.priority),"blue") + " has been deleted\n")
+                task_list.remove(tsk)
     except ValueError:
         print("Please give proper values")
         pass
@@ -55,14 +48,14 @@ def removeTask(task_list):
 def setPriority(task_list):
     try:
         task_modified = raw_input("Select a task to be modified: ")
-        for i,tsk in enumerate(task_list):
-            for j,name in enumerate(tsk):
-                if name == task_modified:
-                    priority_modified = int(raw_input("Select new priority: "))
-                    print(colored("NAME: " + task_list[task_list.index(tsk)][0],"blue") + " has now priority: "\
-                     + colored(str(priority_modified),"red") + "\n")
+        for tsk in task_list:
+            if tsk.name == task_modified:
+                priority_modified = int(raw_input("Select new priority: "))
 
-                    task_list[task_list.index(tsk)][1] = priority_modified
+                print(colored("NAME: " + task_list[task_list.index(tsk)].name,"blue") + " has now priority: "\
+                 + colored(str(priority_modified),"red") + "\n")
+
+                task_list[task_list.index(tsk)].priority = priority_modified
 
     except ValueError:
         print("Please give proper values")
@@ -70,27 +63,27 @@ def setPriority(task_list):
 
 def displayByPriority(task_list):
     print("Current tasks:")
-    for task in sorted(task_list,key=lambda x: x[1],reverse=True):
-        if task[1] == 1:
+    for task in sorted(task_list,key=lambda x: x.priority,reverse=True):
+        if task.priority == 1:
             priorityColor = "green"
             priorityValue = "low"
-        elif task[1] == 2:
+        elif task.priority == 2:
             priorityColor = "yellow"
             priorityValue = "medium"
-        elif task[1] >= 3:
+        elif task.priority >= 3:
             priorityColor = "red"
             priorityValue = "high"
         else:
             priorityColor = "blue"
             priorityValue = "unspecified"
-        cprint("NAME: " + task[0] + " PRIORITY: " + priorityValue,priorityColor)
+        cprint("NAME: " + task.name + " PRIORITY: " + priorityValue,priorityColor)
 
 def displayByName(task_list):
     print("Current tasks:")
-    for task in sorted(task_list,key=lambda x: x[0]):
-        cprint("NAME: " + task[0] + " PRIORITY: " + str(task[1]),"blue")
+    for task in sorted(task_list,key=lambda x: x.name):
+        cprint("NAME: " + task.name + " PRIORITY: " + str(task.priority),"blue")
 
-def defaultAction():
+def defaultAction(task_list):
     cprint("No such action available!\n", "red")
     pass
 
