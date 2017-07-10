@@ -9,7 +9,7 @@ import colorama
 colorama.init()
 
 #global task 'vector'
-tasks = []
+#tasks = []
 
 #primitive ui
 def printMenu():
@@ -22,8 +22,7 @@ def printMenu():
     print("q - quit program\n ")
 
 
-def createTask():
-    global tasks
+def createTask(task_list):
     current_task = []
 
     name = (raw_input("Task name: ")).lower()
@@ -36,46 +35,42 @@ def createTask():
         priority = 0
 
     current_task.append(priority)
-    tasks.append(current_task)
+    task_list.append(current_task)
 
-def removeTask():
-    global tasks
-
+def removeTask(task_list):
     try:
         task_done = raw_input("Select a task to be completed/removed: ")
-        for i,tsk in enumerate(tasks):
+        for i,tsk in enumerate(task_list):
             for j,name in enumerate(tsk):
                 if name == task_done:
                     print(colored("NAME: " + tsk[0] + " PRIORITY: "\
                      + str(tsk[1]),"blue") + " has been deleted\n")
 
-                    tasks.remove(tsk)
+                    task_list.remove(tsk)
 
     except ValueError:
         print("Please give proper values")
         pass
 
-def setPriority():
-    global tasks
-
+def setPriority(task_list):
     try:
         task_modified = raw_input("Select a task to be modified: ")
-        for i,tsk in enumerate(tasks):
+        for i,tsk in enumerate(task_list):
             for j,name in enumerate(tsk):
                 if name == task_modified:
                     priority_modified = int(raw_input("Select new priority: "))
-                    print(colored("NAME: " + tasks[tasks.index(tsk)][0],"blue") + " has now priority: "\
+                    print(colored("NAME: " + task_list[task_list.index(tsk)][0],"blue") + " has now priority: "\
                      + colored(str(priority_modified),"red") + "\n")
 
-                    tasks[tasks.index(tsk)][1] = priority_modified
+                    task_list[task_list.index(tsk)][1] = priority_modified
 
     except ValueError:
         print("Please give proper values")
         pass
 
-def displayByPriority():
+def displayByPriority(task_list):
     print("Current tasks:")
-    for task in sorted(tasks,key=lambda x: x[1],reverse=True):
+    for task in sorted(task_list,key=lambda x: x[1],reverse=True):
         if task[1] == 1:
             priorityColor = "green"
             priorityValue = "low"
@@ -90,9 +85,9 @@ def displayByPriority():
             priorityValue = "unspecified"
         cprint("NAME: " + task[0] + " PRIORITY: " + priorityValue,priorityColor)
 
-def displayByName():
+def displayByName(task_list):
     print("Current tasks:")
-    for task in sorted(tasks,key=lambda x: x[0]):
+    for task in sorted(task_list,key=lambda x: x[0]):
         cprint("NAME: " + task[0] + " PRIORITY: " + str(task[1]),"blue")
 
 def defaultAction():
@@ -101,6 +96,7 @@ def defaultAction():
 
 def main():
     actions = {"1": createTask, "2": removeTask, "3": setPriority, "4": displayByPriority, "5": displayByName}
+    task_list = []
 
     while True:
         printMenu()
@@ -110,7 +106,7 @@ def main():
             break
         else:
             system('clear')
-            actions.get(select, defaultAction)()
+            actions.get(select, defaultAction)(task_list)
 
-##########
-main()
+if __name__ == "__main__":
+    main()
