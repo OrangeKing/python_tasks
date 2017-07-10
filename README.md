@@ -3,7 +3,11 @@
 Simple python tutorial app example with usage of lists and other basic types/structures.
 
 ## Running the application
-
+**Application runs under Python 2.7.12, for python3 use 2to3 script**
+0. Install prerequisites:
+```bash
+pip2 install termacolor, colorama
+```
 1. Clone/fetch project
 2. Run:
 ```bash
