@@ -19,30 +19,81 @@ def printMenu():
     for item in menu_items:
         print(item)
 
+    print("q - quit program\n ")
+
+
 def createTask():
     global tasks
-    name = raw_input("Task name: ")
-    tasks.append(name)
-    pass # TODO
+    current_task = []
+
+    name = (raw_input("Task name: ")).lower()
+    current_task.append(name)
+
+    try:
+        priority = int(raw_input("Select priority (1-low 2-medium 3-high): "))
+    except ValueError:
+        print("Setting default priority as 0")
+        priority = 0
+
+    current_task.append(priority)
+    tasks.append(current_task)
 
 def removeTask():
-    print(colored(tasks.pop(),"blue") + " task has been deleted\n")
-    pass # TODO
+    global tasks
+
+    try:
+        task_done = raw_input("Select a task to be completed/removed: ")
+        for i,tsk in enumerate(tasks):
+            for j,name in enumerate(tsk):
+                if name == task_done:
+                    print(colored("NAME: " + tsk[0] + " PRIORITY: "\
+                     + str(tsk[1]),"blue") + " has been deleted\n")
+
+                    tasks.remove(tsk)
+
+    except ValueError:
+        print("Please give proper values")
+        pass
 
 def setPriority():
-    pass # TODO
+    global tasks
+
+    try:
+        task_modified = raw_input("Select a task to be modified: ")
+        for i,tsk in enumerate(tasks):
+            for j,name in enumerate(tsk):
+                if name == task_modified:
+                    priority_modified = int(raw_input("Select new priority: "))
+                    print(colored("NAME: " + tasks[tasks.index(tsk)][0],"blue") + " has now priority: "\
+                     + colored(str(priority_modified),"red") + "\n")
+
+                    tasks[tasks.index(tsk)][1] = priority_modified
+
+    except ValueError:
+        print("Please give proper values")
+        pass
 
 def displayByPriority():
     print("Current tasks:")
-    for task in tasks:
-        cprint(task,"blue")
-    pass # TODO
+    for task in sorted(tasks,key=lambda x: x[1],reverse=True):
+        if task[1] == 1:
+            priorityColor = "green"
+            priorityValue = "low"
+        elif task[1] == 2:
+            priorityColor = "yellow"
+            priorityValue = "medium"
+        elif task[1] >= 3:
+            priorityColor = "red"
+            priorityValue = "high"
+        else:
+            priorityColor = "blue"
+            priorityValue = "unspecified"
+        cprint("NAME: " + task[0] + " PRIORITY: " + priorityValue,priorityColor)
 
 def displayByName():
     print("Current tasks:")
-    for task in sorted(tasks):
-        cprint(task,"blue")
-    pass # TODO
+    for task in sorted(tasks,key=lambda x: x[0]):
+        cprint("NAME: " + task[0] + " PRIORITY: " + str(task[1]),"blue")
 
 def defaultAction():
     cprint("No such action available!\n", "red")
@@ -60,10 +111,6 @@ def main():
         else:
             system('clear')
             actions.get(select, defaultAction)()
-main()
 
-#Tasks priority
-#Display task format?
-#Display sorted by priority
-#Display sort by name
-#Remove task
+##########
+main()
