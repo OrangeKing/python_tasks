@@ -1,22 +1,24 @@
 #!/usr/bin/env python2
 
-#utility import
+# Utility import
 from os import system
-from termcolor import cprint,colored
+from termcolor import cprint, colored
 import colorama
 
-#coloring support (for priorities & errors)
+# Coloring support (for priorities & errors)
 colorama.init()
+
 
 class Task(object):
     def __init__(self, name, priority):
         self.name = name
         self.priority = priority
 
-#primitive ui
+
+# Primitive ui
 def printMenu():
-    menu_items = ["1 - Create task", "2 - Remove task", "3 - Set priority", \
-    "4 - Display sorted by priority", "5 - Display sorted by name"]
+    menu_items = ["1 - Create task", "2 - Remove task", "3 - Set priority",
+                  "4 - Display by priority", "5 - Display by name"]
     print("Select an action to perform:\n ")
     for item in menu_items:
         print(item)
@@ -57,8 +59,8 @@ def removeTask(task_list):
         task_done = raw_input("Select a task to be completed/removed: ")
         for tsk in task_list:
             if tsk.name == task_done:
-                print(colored("NAME: " + tsk.name + " PRIORITY: "\
-                 + str(tsk.priority), "blue") + " has been deleted\n")
+                print(colored("NAME: " + tsk.name + " PRIORITY: " +
+                      str(tsk.priority), "blue") + " has been deleted\n")
                 task_list.remove(tsk)
 
     except ValueError:
@@ -72,9 +74,9 @@ def setPriority(task_list):
         for tsk in task_list:
             if tsk.name == task_modified:
                 priority_modified = int(raw_input("Select new priority: "))
-
-                print(colored("NAME: " + task_list[task_list.index(tsk)].name, "blue") + " has now priority: "\
-                 + colored(str(priority_modified), "red") + "\n")
+                print(colored("NAME: " + task_list[task_list.index(tsk)].name,
+                              "blue") + " has now priority: " +
+                      colored(str(priority_modified), "red") + "\n")
 
                 task_list[task_list.index(tsk)].priority = priority_modified
 
@@ -98,13 +100,15 @@ def displayByPriority(task_list):
         else:
             priorityColor = "blue"
             priorityValue = "unspecified"
-        cprint("NAME: " + task.name + " PRIORITY: " + priorityValue, priorityColor)
+        cprint("NAME: " + task.name + " PRIORITY: " +
+               priorityValue, priorityColor)
 
 
 def displayByName(task_list):
     print("Current tasks:")
     for task in sorted(task_list, key=lambda x: x.name):
-        cprint("NAME: " + task.name + " PRIORITY: " + str(task.priority), "blue")
+        cprint("NAME: " + task.name + " PRIORITY: " +
+               str(task.priority), "blue")
 
 
 def defaultAction(task_list):
@@ -113,7 +117,8 @@ def defaultAction(task_list):
 
 
 def main():
-    actions = {"1": createTask, "2": removeTask, "3": setPriority, "4": displayByPriority, "5": displayByName}
+    actions = {"1": createTask, "2": removeTask, "3": setPriority,
+               "4": displayByPriority, "5": displayByName}
     task_list = []
 
     while True:
