@@ -1,9 +1,9 @@
 #!/usr/bin/env python2
 """Command-line task manager"""
-# Utility import
+import json
 from os import system
-from termcolor import cprint, colored
 import colorama
+from termcolor import colored, cprint
 
 # Coloring support (for priorities & errors)
 colorama.init()
@@ -14,6 +14,11 @@ class Task(object):
     def __init__(self, name, priority):
         self.name = name
         self.priority = priority
+
+
+class AvailSaveFormat(Exception):
+    """Exception for unavailable file formats for saving"""
+    pass
 
 
 def print_menu():
@@ -117,10 +122,24 @@ def display_by_name(task_list):
 
 def save_to_file(task_list):
     """Save to file of selected type"""
-    with open("tasks.txt", "w") as outfile:
-        for task in task_list:
-            outfile.write(task.name + "\n" + str(task.priority) + "\n")
-    print("Tasklist saved in " + colored("tasks.txt!", "red"))
+    try:
+        f_type = raw_input("Select filetype to save (txt/json): ")
+        if f_type == "txt":
+            with open("tasks.txt", "w") as outfile:
+                for task in task_list:
+                    outfile.write(task.name + "\n" + str(task.priority) + "\n")
+        elif f_type == "json":
+            with open('data.json', 'a') as outfile:
+                for task in task_list:
+                    json.dump({"name": task.name, "priority": task.priority},
+                              outfile)
+        else:
+            raise(AvailSaveFormat)
+        print("Tasklist saved in " + colored("tasks." + f_type, "red"))
+
+    except AvailSaveFormat:
+        cprint("No such format available!\n", "red")
+
 
 def read_from_file(task_list):
     """Read from a file of selected type"""
@@ -134,11 +153,12 @@ def read_from_file(task_list):
                     break
                 task_list.append(Task(name, int(priority)))
         print("Tasklist read from " + colored("tasks.txt!", "green"))
+
     except IOError:
         cprint("No such file available!\n", "red")
 
 
-def default_action(task_list):
+def default_action(*_):
     """Default action if no menu element is selected"""
     cprint("No such action available!\n", "red")
 
