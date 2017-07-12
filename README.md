@@ -25,3 +25,4 @@ It allows users to:
 * Display tasks, their status and priority sorted by priority
 * Display tasks, their status and priority sorted alphabetically
 * Remove tasks
+Modified version allows user to save their tasklist into txt/csv files, as well reading from them.

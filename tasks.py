@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-
+"""Command-line task manager"""
 # Utility import
 from os import system
 from termcolor import cprint, colored
@@ -10,15 +10,17 @@ colorama.init()
 
 
 class Task(object):
+    """Task representation"""
     def __init__(self, name, priority):
         self.name = name
         self.priority = priority
 
 
-# Primitive ui
-def printMenu():
+def print_menu():
+    """Display menu to the user"""
     menu_items = ["1 - Create task", "2 - Remove task", "3 - Set priority",
-                  "4 - Display by priority", "5 - Display by name"]
+                  "4 - Display by priority", "5 - Display by name",
+                  "6 - Save to a file", "7 - Read from a file\n"]
     print("Select an action to perform:\n ")
     for item in menu_items:
         print(item)
@@ -26,7 +28,8 @@ def printMenu():
     print("q - quit program\n ")
 
 
-def createTask(task_list):
+def create_task(task_list):
+    """Parse user input to create task object"""
     try:
         name = (raw_input("Task name(max 20 characters): "))[:20].lower()
 
@@ -41,7 +44,6 @@ def createTask(task_list):
 
     except ValueError:
         print("Please give proper values")
-        pass
 
     try:
         priority = int(raw_input("Select priority (1-low 2-medium 3-high): "))
@@ -54,21 +56,22 @@ def createTask(task_list):
     task_list.append(current_task)
 
 
-def removeTask(task_list):
+def remove_task(task_list):
+    """Remove task from the list of given name"""
     try:
         task_done = raw_input("Select a task to be completed/removed: ")
         for tsk in task_list:
             if tsk.name == task_done:
                 print(colored("NAME: " + tsk.name + " PRIORITY: " +
-                      str(tsk.priority), "blue") + " has been deleted\n")
+                              str(tsk.priority), "blue") + " deleted\n")
                 task_list.remove(tsk)
 
     except ValueError:
         print("Please give proper values")
-        pass
 
 
-def setPriority(task_list):
+def set_priority(task_list):
+    """Set priority of given task to given value"""
     try:
         task_modified = raw_input("Select a task to be modified: ")
         for tsk in task_list:
@@ -82,54 +85,80 @@ def setPriority(task_list):
 
     except ValueError:
         print("Please give proper values")
-        pass
 
 
-def displayByPriority(task_list):
+def display_by_priority(task_list):
+    """Display tak list ordered by priority values"""
     print("Current tasks:")
     for task in sorted(task_list, key=lambda x: x.priority, reverse=True):
         if task.priority == 1:
-            priorityColor = "green"
-            priorityValue = "low"
+            priority_color = "green"
+            priority_value = "low"
         elif task.priority == 2:
-            priorityColor = "yellow"
-            priorityValue = "medium"
+            priority_color = "yellow"
+            priority_value = "medium"
         elif task.priority >= 3:
-            priorityColor = "red"
-            priorityValue = "high"
+            priority_color = "red"
+            priority_value = "high"
         else:
-            priorityColor = "blue"
-            priorityValue = "unspecified"
+            priority_color = "blue"
+            priority_value = "unspecified"
         cprint("NAME: " + task.name + " PRIORITY: " +
-               priorityValue, priorityColor)
+               priority_value, priority_color)
 
 
-def displayByName(task_list):
+def display_by_name(task_list):
+    """Display tak list ordered by name"""
     print("Current tasks:")
     for task in sorted(task_list, key=lambda x: x.name):
         cprint("NAME: " + task.name + " PRIORITY: " +
                str(task.priority), "blue")
 
 
-def defaultAction(task_list):
+def save_to_file(task_list):
+    """Save to file of selected type"""
+    with open("tasks.txt", "w") as outfile:
+        for task in task_list:
+            outfile.write(task.name + "\n" + str(task.priority) + "\n")
+    print("Tasklist saved in " + colored("tasks.txt!", "red"))
+
+def read_from_file(task_list):
+    """Read from a file of selected type"""
+    try:
+        filename = raw_input("Enter name of file to be read from:")
+        with open(filename, "r") as infile:
+            while True:
+                name = infile.readline().rstrip()
+                priority = infile.readline().rstrip()
+                if not priority:
+                    break
+                task_list.append(Task(name, int(priority)))
+        print("Tasklist read from " + colored("tasks.txt!", "green"))
+    except IOError:
+        cprint("No such file available!\n", "red")
+
+
+def default_action(task_list):
+    """Default action if no menu element is selected"""
     cprint("No such action available!\n", "red")
-    pass
 
 
 def main():
-    actions = {"1": createTask, "2": removeTask, "3": setPriority,
-               "4": displayByPriority, "5": displayByName}
+    """Main app function"""
+    actions = {"1": create_task, "2": remove_task, "3": set_priority,
+               "4": display_by_priority, "5": display_by_name,
+               "6": save_to_file, "7": read_from_file}
     task_list = []
 
     while True:
-        printMenu()
+        print_menu()
         select = raw_input("\nSelect an option: ")
 
         if select == "q":
             break
         else:
             system('clear')
-            actions.get(select, defaultAction)(task_list)
+            actions.get(select, default_action)(task_list)
 
 if __name__ == "__main__":
 
