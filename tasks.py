@@ -1,7 +1,9 @@
 #!/usr/bin/env python2
 """Command-line task manager"""
+import csv
 import json
 from os import system
+
 import colorama
 from termcolor import colored, cprint
 
@@ -16,7 +18,7 @@ class Task(object):
         self.priority = priority
 
 
-class AvailSaveFormat(Exception):
+class AvailFileFormat(Exception):
     """Exception for unavailable file formats for saving"""
     pass
 
@@ -123,28 +125,84 @@ def display_by_name(task_list):
 def save_to_file(task_list):
     """Save to file of selected type"""
     try:
-        f_type = raw_input("Select filetype to save (txt/json): ")
+        f_type = raw_input("Select filetype to save (txt/json/csv): ")
         if f_type == "txt":
             with open("tasks.txt", "w") as outfile:
                 for task in task_list:
                     outfile.write(task.name + "\n" + str(task.priority) + "\n")
         elif f_type == "json":
-            with open('data.json', 'a') as outfile:
+            with open('tasks.json', 'w') as outfile:
+                elements = []
                 for task in task_list:
-                    json.dump({"name": task.name, "priority": task.priority},
-                              outfile)
+                    j_elem = {"name": task.name, "priority": task.priority}
+                    elements.append(j_elem)
+                json.dump(elements, outfile)
+        elif f_type == "csv":
+            with open('tasks.csv', 'w') as outfile:
+                elements = [],
+                task_writer = csv.writer(outfile, delimiter=' ', quotechar='|',
+                                         quoting=csv.QUOTE_MINIMAL)
+                for task in task_list:
+                    task_writer.writerow([task.name] + [task.priority])
         else:
-            raise(AvailSaveFormat)
+            raise(AvailFileFormat)
+
         print("Tasklist saved in " + colored("tasks." + f_type, "red"))
 
-    except AvailSaveFormat:
+    except AvailFileFormat:
         cprint("No such format available!\n", "red")
 
 
 def read_from_file(task_list):
     """Read from a file of selected type"""
     try:
-        filename = raw_input("Enter name of file to be read from:")
+        filename = raw_input("Select file to read data from (txt/json/csv): ")
+        if filename.endswith(".txt"):
+            read_txt(task_list, filename)
+        elif filename.endswith(".json"):
+            read_json(task_list, filename)
+        elif filename.endswith(".csv"):
+            read_csv(task_list, filename)
+        else:
+            raise(AvailFileFormat)
+
+    except AvailFileFormat:
+        cprint("Unsupported file format!\n", "red")
+
+
+def read_csv(task_list, filename):
+    """Reading tasklist from csv file"""
+    try:
+        with open(filename, "r") as infile:
+            task_reader = csv.reader(infile, delimiter=' ', quotechar='|')
+            for row in task_reader:
+                name = row[0]
+                priority = row[1]
+                task_list.append(Task(name, int(priority)))
+        print("Tasklist read from " + colored(filename, "green"))
+
+    except IOError:
+        cprint("No such file available!\n", "red")
+
+
+def read_json(task_list, filename):
+    """Reading tasklist from json file"""
+    try:
+        with open(filename, "r") as infile:
+            task_json = json.load(infile)
+            for task in task_json:
+                name = task.get('name')
+                priority = task.get('priority')
+                task_list.append(Task(name, int(priority)))
+        print("Tasklist read from " + colored(filename, "green"))
+
+    except IOError:
+        cprint("No such file available!\n", "red")
+
+
+def read_txt(task_list, filename):
+    """Reading tasklist from text file"""
+    try:
         with open(filename, "r") as infile:
             while True:
                 name = infile.readline().rstrip()
@@ -152,7 +210,7 @@ def read_from_file(task_list):
                 if not priority:
                     break
                 task_list.append(Task(name, int(priority)))
-        print("Tasklist read from " + colored("tasks.txt!", "green"))
+        print("Tasklist read from " + colored(filename, "green"))
 
     except IOError:
         cprint("No such file available!\n", "red")
